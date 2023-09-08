@@ -25,7 +25,7 @@ if ! command -v ansible &>/dev/null; then
   echo "Installing Ansible..."
   # Use the appropriate package manager (apt, yum, dnf)
   if command -v apt-get &>/dev/null; then
-    apt-get update
+    apt-get update > /dev/null
     apt-get install -y ansible > /dev/null
   elif command -v yum &>/dev/null; then
     yum install -y ansible > /dev/null
@@ -46,7 +46,7 @@ if ! command -v sshpass &>/dev/null; then
   echo "Installing sshpass..."
   # Use the appropriate package manager (apt, yum, dnf)
   if command -v apt-get &>/dev/null; then
-    apt-get update
+    apt-get update > /dev/null
     apt-get install -y sshpass > /dev/null
   elif command -v yum &>/dev/null; then
     yum install -y sshpass > /dev/null
