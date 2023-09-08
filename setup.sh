@@ -9,48 +9,51 @@ cat << "EOF"
 ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝ ╚═════╝     ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝
                                                                                                          
 EOF
-# Kiểm tra xem script được chạy với quyền root hay không
+
+# Check if the script is running as root
 if [ "$EUID" -ne 0 ]; then
-  echo "Vui lòng chạy script này với quyền root hoặc sử dụng sudo"
+  echo "Please run this script with root privileges or using sudo"
   exit 1
 fi
+
 echo "---------------------------------------------------------------------------------------------------------------------"
 echo "                                        Install Ansible"
 echo "---------------------------------------------------------------------------------------------------------------------"
 
-# Cài đặt gói Ansible (nếu chưa được cài đặt)
+# Install Ansible package (if not already installed)
 if ! command -v ansible &>/dev/null; then
-  echo "Cài đặt gói Ansible..."
-  # Sử dụng trình quản lý gói tương ứng (apt, yum, dnf)
+  echo "Installing Ansible..."
+  # Use the appropriate package manager (apt, yum, dnf)
   if command -v apt-get &>/dev/null; then
     apt-get update
-    apt-get install -y ansible
+    apt-get install -y ansible > /dev/null
   elif command -v yum &>/dev/null; then
-    yum install -y ansible
+    yum install -y ansible > /dev/null
   elif command -v dnf &>/dev/null; then
-    dnf install -y ansible
+    dnf install -y ansible > /dev/null
   else
-    echo "Không tìm thấy trình quản lý gói phù hợp. Hãy cài đặt Ansible bằng cách thủ công."
+    echo "Could not find a suitable package manager. Please install Ansible manually."
     exit 1
   fi
 fi
+
 echo "---------------------------------------------------------------------------------------------------------------------"
 echo "                                        Install sshpass"
 echo "---------------------------------------------------------------------------------------------------------------------"
 
-# Cài đặt gói sshpass (nếu chưa được cài đặt)
+# Install sshpass package (if not already installed)
 if ! command -v sshpass &>/dev/null; then
-  echo "Cài đặt gói sshpass..."
-  # Sử dụng trình quản lý gói tương ứng (apt, yum, dnf)
+  echo "Installing sshpass..."
+  # Use the appropriate package manager (apt, yum, dnf)
   if command -v apt-get &>/dev/null; then
     apt-get update
-    apt-get install -y sshpass
+    apt-get install -y sshpass > /dev/null
   elif command -v yum &>/dev/null; then
-    yum install -y sshpass
+    yum install -y sshpass > /dev/null
   elif command -v dnf &>/dev/null; then
-    dnf install -y sshpass
+    dnf install -y sshpass > /dev/null
   else
-    echo "Không tìm thấy trình quản lý gói phù hợp cho sshpass. Hãy cài đặt sshpass bằng cách thủ công."
+    echo "Could not find a suitable package manager for sshpass. Please install sshpass manually."
     exit 1
   fi
 fi
@@ -81,8 +84,8 @@ echo "--------------------------------------------------------------------------
 echo "                                        Start Playbook"
 echo "---------------------------------------------------------------------------------------------------------------------"
 
-# Chạy playbook Ansible
-echo "Chạy playbook Ansible..."
+# Run the Ansible playbook
+echo "Running Ansible playbook..."
 ansible-playbook -i inventory.ini install_docker_portainer.yml
 
-echo "Cài đặt Ansible và sshpass, sau đó chạy playbook Ansible thành công"
+echo "Ansible and sshpass installation, followed by Ansible playbook execution, completed successfully."
