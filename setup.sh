@@ -40,6 +40,25 @@ if ! command -v sshpass &>/dev/null; then
   fi
 fi
 
+
+# Specify the path to your inventory file
+inventory_file="inventory.ini"
+
+# Read the inventory file and extract host information
+while IFS= read -r line; do
+  # Check if the line contains host information
+  if [[ $line =~ ^[a-zA-Z0-9_]+[[:space:]]+ansible_host=[[:alnum:].]+[[:space:]]+ansible_user=[[:alnum:]]+[[:space:]]+ansible_ssh_pass=[[:alnum:]]+[[:space:]]+ansible_become_pass=[[:alnum:]]+$ ]]; then
+    # Extract the hostname or IP address
+    host=$(echo "$line" | awk -F 'ansible_host=' '{print $2}' | awk '{print $1}')
+    
+    # Extract the SSH username
+    username=$(echo "$line" | awk -F 'ansible_user=' '{print $2}' | awk '{print $1}')
+    
+    # Use ssh-keyscan to save the host's fingerprint
+    ssh-keyscan -H "$host" >> ~/.ssh/known_hosts
+  fi
+done < "$inventory_file"
+
 # Chạy playbook Ansible
 echo "Chạy playbook Ansible..."
 ansible-playbook -i inventory.ini install_docker_portainer.yml
