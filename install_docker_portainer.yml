@@ -6,9 +6,14 @@
 
   tasks:
     - name: Set the hostname
-        hostname:
+      hostname:
         name: "{{ inventory_hostname }}"
-        
+
+    - name: Add entries to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ inventory_hostname }} {{ hostvars[inventory_hostname]['ansible_host'] | default(inventory_hostname) }}"
+
     - name: Install aptitude (for Ubuntu)
       apt:
         name: aptitude
@@ -78,7 +83,6 @@
       pip:
         name: docker
 
----
 - name: Run Portainer Container
   hosts: master
   become: yes
