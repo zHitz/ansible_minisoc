@@ -5,6 +5,10 @@
   become_user: root
 
   tasks:
+    - name: Set the hostname
+        hostname:
+        name: "{{ inventory_hostname }}"
+        
     - name: Install aptitude (for Ubuntu)
       apt:
         name: aptitude
