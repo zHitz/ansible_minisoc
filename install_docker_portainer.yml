@@ -78,25 +78,39 @@
       pip:
         name: docker
 
+---
 - name: Run Portainer Container
   hosts: master
   become: yes
   become_user: root
 
   tasks:
-
     - name: Pull Portainer Docker image
       community.docker.docker_image:
         name: portainer/portainer-ce:latest
         source: pull
-      when: "ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'"
+      when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
 
-- name: Run Portainer Container
-  community.docker.docker_container:- name: Enable UFW
+    - name: Run Portainer Container
+      community.docker.docker_container:
+        name: portainer
+        image: portainer/portainer-ce:latest
+        ports:
+          - "8000:8000"
+          - "9443:9443"
+        restart_policy: always
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - portainer_data:/data
+        state: started
+      when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+
+- name: Setting Firewall
   hosts: all
-  become: yes  # Run commands with elevated privileges
+  become: yes
+  become_user: root
 
-  tasks:
+  task:
     - name: Install UFW (Ubuntu)
       apt:
         name: ufw
@@ -113,7 +127,7 @@
         state: started
         enabled: yes
 
-    - name: Allow SSH (Port 22) through UFW or firewalld
+    - name: Allow SSH (Port 22) through UFW or firewalld (CentOS)
       firewalld:
         service: ssh
         permanent: yes
@@ -121,10 +135,10 @@
         immediate: yes
       when: ansible_distribution == 'CentOS'
 
-    - name: Allow SSH (Port '22') through UFW (Ubuntu)
+    - name: Allow SSH (Port 22) through UFW (Ubuntu)
       ufw:
         rule: allow
-        port: '22'  # Enclose the value in quotes to avoid the warning
+        port: '22'
         proto: tcp
       when: ansible_distribution == 'Ubuntu'
 
@@ -132,16 +146,3 @@
       ufw:
         state: enabled
       when: ansible_distribution == 'Ubuntu'
-
-        name: portainer
-        image: portainer/portainer-ce:latest
-        ports:
-          - "8000:8000"
-          - "9443:9443"
-        restart_policy: always
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
-          - portainer_data:/data
-        state: started
-      when: "ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'"
-
