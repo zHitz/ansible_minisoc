@@ -91,8 +91,48 @@
         source: pull
       when: "ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'"
 
-    - name: Run Portainer Container
-      community.docker.docker_container:
+- name: Run Portainer Container
+  community.docker.docker_container:- name: Enable UFW
+  hosts: all
+  become: yes  # Run commands with elevated privileges
+
+  tasks:
+    - name: Install UFW (Ubuntu)
+      apt:
+        name: ufw
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Install firewalld (CentOS)
+      yum:
+        name: firewalld
+      when: ansible_distribution == 'CentOS'
+
+    - name: Start and enable UFW or firewalld service
+      systemd:
+        name: "{{ 'ufw' if ansible_distribution == 'Ubuntu' else 'firewalld' }}"
+        state: started
+        enabled: yes
+
+    - name: Allow SSH (Port 22) through UFW or firewalld
+      firewalld:
+        service: ssh
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: ansible_distribution == 'CentOS'
+
+    - name: Allow SSH (Port '22') through UFW (Ubuntu)
+      ufw:
+        rule: allow
+        port: '22'  # Enclose the value in quotes to avoid the warning
+        proto: tcp
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Enable UFW (Ubuntu)
+      ufw:
+        state: enabled
+      when: ansible_distribution == 'Ubuntu'
+
         name: portainer
         image: portainer/portainer-ce:latest
         ports:
@@ -104,3 +144,4 @@
           - portainer_data:/data
         state: started
       when: "ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'"
+
