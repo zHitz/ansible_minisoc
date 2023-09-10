@@ -110,7 +110,7 @@
   become: yes
   become_user: root
 
-  task:
+  tasks:
     - name: Install UFW (Ubuntu)
       apt:
         name: ufw
