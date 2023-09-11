@@ -10,6 +10,11 @@ cat << "EOF"
 ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝ ╚═════╝     ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝
                                                                                                          
 EOF
+echo "--------------------------------------------------------------------------------------------------------"
+echo "                                  Deploy HISSC MiniSOC Multi Nodes Script"
+echo "                            Welcome to the Deploy HISSC MiniSOC Multi Nodes Script"
+echo "                             © 2023 HISSC CyberSoc. All rights reserved."
+echo "--------------------------------------------------------------------------------------------------------"
 
 # Check if the script is running as root
 if [ "$EUID" -ne 0 ]; then
