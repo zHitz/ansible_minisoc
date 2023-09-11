@@ -92,6 +92,6 @@ echo "--------------------------------------------------------------------------
 
 # Run the Ansible playbook
 echo "Running Ansible playbook..."
-ansible-playbook -i inventory.ini install_docker_portainer.yml
+ansible-playbook -i inventory.ini deploy.yml
 
 echo "Ansible and sshpass installation, followed by Ansible playbook execution, completed successfully."
