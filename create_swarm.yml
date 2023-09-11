@@ -1,0 +1,19 @@
+---
+- name: Initialize Docker Swarm
+  hosts: master
+  tasks:
+    - name: Get Docker Swarm Join Token
+      command: docker swarm init --advertise-addr "{{ hostvars[inventory_hostname].ansible_host }}"
+      register: swarm_init_output
+      changed_when: false
+
+    - name: Set Swarm Join Token Fact
+      set_fact:
+        swarm_join_token: "{{ swarm_init_output.stdout_lines[-1] }}"
+      when: swarm_init_output.rc == 0
+
+- name: Join Docker Swarm Workers
+  hosts: workers
+  tasks:
+    - name: Join Docker Swarm
+      command: "docker swarm join --token {{ swarm_join_token }} {{ hostvars[master].ansible_host }}:2377"
