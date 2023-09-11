@@ -89,11 +89,16 @@
   become_user: root
 
   tasks:
+    - name: Confirm before Install Portainer Container
+      pause:
+        prompt: "Do you want to Install Portainer Container (Master Nodes)? (yes/no)"
+      register: confirm_install_portainer
+  
     - name: Pull Portainer Docker image
       community.docker.docker_image:
         name: portainer/portainer-ce:latest
         source: pull
-      when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+      when: (ansible_os_family == 'Debian' or ansible_os_family == 'RedHat') and confirm_install_portainer.user_input == 'yes'
 
     - name: Run Portainer Container
       community.docker.docker_container:
@@ -107,7 +112,7 @@
           - /var/run/docker.sock:/var/run/docker.sock
           - portainer_data:/data
         state: started
-      when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+      when: (ansible_os_family == 'Debian' or ansible_os_family == 'RedHat') and confirm_install_portainer.user_input == 'yes'
 
 - name: Setting Firewall
   hosts: all
@@ -115,21 +120,27 @@
   become_user: root
 
   tasks:
+    - name: Confirm before change Setting Firewall
+      pause:
+        prompt: "Do you want to change Setting Firewall ? (yes/no)"
+      register: confirm_setting_firewall
+
     - name: Install UFW (Ubuntu)
       apt:
         name: ufw
-      when: ansible_distribution == 'Ubuntu'
+      when: ansible_distribution == 'Ubuntu' and confirm_setting_firewall.user_input == 'yes'
 
     - name: Install firewalld (CentOS)
       yum:
         name: firewalld
-      when: ansible_distribution == 'CentOS'
+      when: ansible_distribution == 'CentOS' and confirm_setting_firewall.user_input == 'yes'
 
     - name: Start and enable UFW or firewalld service
       systemd:
         name: "{{ 'ufw' if ansible_distribution == 'Ubuntu' else 'firewalld' }}"
         state: started
         enabled: yes
+      when: confirm_setting_firewall.user_input == 'yes'
 
     - name: Allow SSH (Port 22) through UFW or firewalld (CentOS)
       firewalld:
@@ -137,16 +148,16 @@
         permanent: yes
         state: enabled
         immediate: yes
-      when: ansible_distribution == 'CentOS'
+      when: ansible_distribution == 'CentOS' and confirm_setting_firewall.user_input == 'yes'
 
     - name: Allow SSH (Port 22) through UFW (Ubuntu)
       ufw:
         rule: allow
         port: '22'
         proto: tcp
-      when: ansible_distribution == 'Ubuntu'
+      when: ansible_distribution == 'Ubuntu' and confirm_setting_firewall.user_input == 'yes'
 
     - name: Enable UFW (Ubuntu)
       ufw:
         state: enabled
-      when: ansible_distribution == 'Ubuntu'
+      when: ansible_distribution == 'Ubuntu' and confirm_setting_firewall.user_input == 'yes'
