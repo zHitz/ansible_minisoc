@@ -10,12 +10,19 @@
   hosts: all
   roles:
     - install-docker
-
+    
+- name: Confirm before change Setting Firewall
+  hosts: all
+  pause:
+    prompt: "Do you want to change Setting Firewall ? (yes/no)"
+  register: confirm_setting_firewall
+  
 - name: Setting firewall
   hosts: all
   become: yes
   roles:
     - setting-firewall
+  when: confirm_setting_firewall.user_input == 'yes'
 
 - name: initialize docker swarm (master)
   hosts: master
