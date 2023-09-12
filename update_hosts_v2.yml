@@ -1,3 +1,4 @@
+---
   - name: host file update - Local DNS setup across all the servers
     hosts: all
     become: yes
