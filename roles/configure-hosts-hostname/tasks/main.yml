@@ -19,7 +19,6 @@
     path: /etc/hosts
     line: "{{ lookup('template', './templates/hosts.j2') }}"
     insertafter: EOF
-  notify: Reload hosts file
 
 - name: Reload hosts file
   command: systemctl restart systemd-resolved
