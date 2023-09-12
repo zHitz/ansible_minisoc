@@ -1,4 +1,3 @@
-  GNU nano 6.2                                                                                create_swarm.yml
 ---
 - name: Initialize and Join Docker Swarm
   hosts: master
