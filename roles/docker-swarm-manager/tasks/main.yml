@@ -1,4 +1,9 @@
 ---
+- name: Leave Swarm if have
+  shell: "docker swarm leave -f"
+  ignore_errors: yes
+  failed_when: false
+  
 - name: Create primary swarm manager
   shell: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
 
