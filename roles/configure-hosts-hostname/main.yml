@@ -22,7 +22,7 @@
     - name: Append hosts template to /etc/hosts if not exist
       lineinfile:
         path: /etc/hosts
-        line: "{{ lookup('template', 'hosts.j2') }}"
+        line: "{{ lookup('template', './templates/hosts.j2') }}"
         insertafter: EOF
       notify: Reload hosts file
 
