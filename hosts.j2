@@ -1,4 +1,0 @@
-# Additional Ansible Inventory hosts file entries
-{% for host in groups['all'] %}
-{{ hostvars[host]['ansible_host'] }} {{ host }}
-{% endfor %}
