@@ -96,6 +96,6 @@ echo "--------------------------------------------------------------------------
 
 # Run the Ansible playbook
 echo "Running Ansible playbook..."
-ansible-playbook -i inventory.ini deploy.yml
+ansible-playbook -i inventory.ini main.yml
 
 echo "Ansible and sshpass installation, followed by Ansible playbook execution, completed successfully."
