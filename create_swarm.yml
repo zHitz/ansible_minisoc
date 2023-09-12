@@ -3,18 +3,6 @@
   hosts: master
   become: yes
   tasks:
-
-    - name: Check if host is in Swarm
-      command: docker node ls
-      ignore_errors: yes
-      register: swarm_status
-      changed_when: false
-
-    - name: Leave Swarm if Already Joined
-      command: docker swarm leave -f
-      ignore_errors: yes
-      when: swarm_status.rc == 0
-
     - name: Create primary swarm manager
       shell: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
 
@@ -41,20 +29,7 @@
 - hosts: workers
   become: yes
   tasks:
-    - name: Check if host is in Swarm
-      command: docker node ls
-      ignore_errors: yes
-      register: swarm_status
-      changed_when: false
-
-    - name: Leave Swarm if Already Joined
-      command: docker swarm leave -f
-      ignore_errors: yes
-      when: swarm_status.rc == 0
-
     - name: Join the swarm as a worker
       shell: "docker swarm join --token {{ lookup('file', '/tmp/dsm_wt') }} {{ lookup('file', '/tmp/dsm_ip') }}:2377"
       retries: 5
       delay: 5
-
-
