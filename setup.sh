@@ -10,11 +10,11 @@ cat << "EOF"
 ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝ ╚═════╝     ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝
                                                                                                          
 EOF
-echo "--------------------------------------------------------------------------------------------------------"
+echo "---------------------------------------------------------------------------------------------------------------------"
 echo "                                  Deploy HISSC MiniSOC Multi Nodes Script"
 echo "                            Welcome to the Deploy HISSC MiniSOC Multi Nodes Script"
 echo "                             © 2023 HISSC CyberSoc. All rights reserved."
-echo "--------------------------------------------------------------------------------------------------------"
+echo "---------------------------------------------------------------------------------------------------------------------"
 
 # Check if the script is running as root
 if [ "$EUID" -ne 0 ]; then
@@ -91,11 +91,32 @@ while IFS= read -r line; do
 done < "$inventory_file"
 
 echo "---------------------------------------------------------------------------------------------------------------------"
+echo "                                        Encrypt Inventory File"
+echo "---------------------------------------------------------------------------------------------------------------------"
+
+INVENTORY_FILE="./inventory.ini"
+CHECK_FILE="./check_inventory_encrypt.txt"
+
+if [ -f "$CHECK_FILE" ] && grep -q "Encrypted_Inventory=TRUE" "$CHECK_FILE"; then
+    echo "Inventory file is already encrypted. Proceeding..."
+
+else
+    encryption_success=false
+    echo "Input Encrypt Password for Inventory"
+    while [ "$encryption_success" = false ]; do
+        ansible-vault encrypt "$INVENTORY_FILE" && encryption_success=true
+        sleep 1 
+    done
+
+    echo "Encrypted_Inventory=TRUE" > "$CHECK_FILE"
+fi
+
+echo "---------------------------------------------------------------------------------------------------------------------"
 echo "                                        Start Playbook"
 echo "---------------------------------------------------------------------------------------------------------------------"
 
 # Run the Ansible playbook
 echo "Running Ansible playbook..."
-ansible-playbook -i inventory.ini main.yml
+ansible-playbook -i inventory.ini main.yml --ask-vault-pass
 
 echo "Ansible and sshpass installation, followed by Ansible playbook execution, completed successfully."
